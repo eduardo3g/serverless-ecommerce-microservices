@@ -23,3 +23,9 @@ The `cdk.json` file tells the CDK Toolkit how to execute your app.
 - Delete the basket
 - List my orders and order items history
 - Query my orders with orderDate
+
+## User Stories
+
+- As a user I want to list my products
+- As a user I want to filter products as per categories
+- As a admin I want to create, update and delete products
