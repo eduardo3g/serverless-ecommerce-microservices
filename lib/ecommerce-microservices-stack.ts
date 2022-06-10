@@ -13,7 +13,7 @@ export class EcommerceMicroservicesStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const productTable = new Table(scope, "product", {
+    const productTable = new Table(this, "product", {
       partitionKey: {
         name: "id",
         type: AttributeType.STRING,
