@@ -4,6 +4,7 @@ const {
   PutItemCommand,
 } = require("@aws-sdk/client-dynamodb");
 const { marshall, unmarshall } = require("@aws-sdk/util-dynamodb");
+import { v4 as uuid } from "uuid";
 const { ddbClient } = require("./ddbClient");
 
 exports.handler = async (event) => {
@@ -73,6 +74,8 @@ const createProduct = async (requestBody) => {
   console.log(`createProduct function. request body: "${requestBody}"`);
 
   try {
+    requestBody.id = uuid();
+
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Item: marshall(requestBody || {}),
