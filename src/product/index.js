@@ -1,4 +1,8 @@
-const { GetItemCommand, ScanCommand } = require("@aws-sdk/client-dynamodb");
+const {
+  GetItemCommand,
+  ScanCommand,
+  PutItemCommand,
+} = require("@aws-sdk/client-dynamodb");
 const { marshall, unmarshall } = require("@aws-sdk/util-dynamodb");
 const { ddbClient } = require("./ddbClient");
 
@@ -12,6 +16,11 @@ exports.handler = async (event) => {
       } else {
         body = await getAllProducts();
       }
+    case "POST":
+      body = await createProduct(JSON.parse(event.body));
+      break;
+    default:
+      throw new Error(`Unsupported route: ${event.httpMethod}`);
   }
 
   return {
@@ -54,6 +63,26 @@ const getAllProducts = async () => {
     console.log(Items);
 
     return Items ? Items.map((item) => unmarshall(item)) : {};
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+};
+
+const createProduct = async (requestBody) => {
+  console.log(`createProduct function. request body: "${requestBody}"`);
+
+  try {
+    const params = {
+      TableName: process.env.DYNAMODB_TABLE_NAME,
+      Item: marshall(requestBody || {}),
+    };
+
+    const createResult = await ddbClient.send(new PutItemCommand(params));
+
+    console.log(createResult);
+
+    return createResult;
   } catch (e) {
     console.error(e);
     throw e;
