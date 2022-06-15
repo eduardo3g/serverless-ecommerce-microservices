@@ -13,33 +13,50 @@ const { ddbClient } = require("./ddbClient");
 exports.handler = async (event) => {
   console.log("request", JSON.stringify(event, null, 2));
 
-  switch (event.httpMethod) {
-    case "GET":
-      if (event.queryStringParameters != null) {
-        body = await getProductsByCategory(event);
-      } else if (event.pathParameters != null) {
-        body = await getProduct(event.pathParameters.id);
-      } else {
-        body = await getAllProducts();
-      }
-    case "POST":
-      body = await createProduct(JSON.parse(event.body));
-      break;
-    case "DELETE":
-      body = await deleteProduct(event.pathParameters.id);
-      break;
-    case "PUT":
-      body = await updateProduct(event.body);
-      break;
-    default:
-      throw new Error(`Unsupported route: ${event.httpMethod}`);
-  }
+  let body;
 
-  return {
-    statusCode: 200,
-    headers: { "Content-Type": "text/plain" },
-    body: `Hello from Product ! You've hit ${event.path}`,
-  };
+  try {
+    switch (event.httpMethod) {
+      case "GET":
+        if (event.queryStringParameters != null) {
+          body = await getProductsByCategory(event);
+        } else if (event.pathParameters != null) {
+          body = await getProduct(event.pathParameters.id);
+        } else {
+          body = await getAllProducts();
+        }
+      case "POST":
+        body = await createProduct(JSON.parse(event.body));
+        break;
+      case "DELETE":
+        body = await deleteProduct(event.pathParameters.id);
+        break;
+      case "PUT":
+        body = await updateProduct(event.body);
+        break;
+      default:
+        throw new Error(`Unsupported route: ${event.httpMethod}`);
+    }
+
+    console.log(body);
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: `Successfully finished operation: "${event.httpMethod}"`,
+        body,
+      }),
+    };
+  } catch (e) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: "Failed to perform operation.",
+        errorMessage: e.message,
+        errorStack: e.stack,
+      }),
+    };
+  }
 };
 
 const getProduct = async (productId) => {
