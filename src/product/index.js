@@ -25,6 +25,7 @@ exports.handler = async (event) => {
         } else {
           body = await getAllProducts();
         }
+        break;
       case "POST":
         body = await createProduct(JSON.parse(event.body));
         break;
